@@ -14,7 +14,7 @@ InteriorCraft is a modern interior design website that helps users explore desig
 - JavaScript
 
 ## 🌐 Live Demo
-https://yourusername.github.io/interiorcraft/
+https://Vaishnavi2724.github.io/interiorcraft/
 
 ## 📸 Screenshots
 (Add images here)
