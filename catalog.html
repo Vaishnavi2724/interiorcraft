@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/catalog.css') }}">
+<link rel="stylesheet" href="css/catalog.css">
 {% endblock %}
 
 {% block content %}
@@ -150,7 +150,7 @@
 %}
 
     <div class="card-image">
-        <img src="{{ url_for('static', filename='img/' + img) }}">
+        <img src="img/' + img">
     </div>
 
    <div class="card-info">
@@ -174,7 +174,7 @@
     <button class="cart-btn"
         data-name="{{name}}"
         data-price="{{price}}"
-        data-img="{{ url_for('static', filename='img/' + img) }}">
+        data-img="img/' + img">
         Add to Cart 🛒
     </button>
 

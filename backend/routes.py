@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
+from flask import Blueprint, render_template, request, jsonify, redirect, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from extensions import db, login_manager
 from models import User, Design
@@ -73,7 +73,7 @@ def handle_contact():
 
     flash("Message sent successfully ✅", "success")
 
-    return redirect(url_for("main_routes.about"))
+    return redirect("main_routes.about")
 
 @main_routes.route("/generate-ai-design", methods=["POST"])
 def generate_ai_design():
@@ -151,7 +151,7 @@ def generate_ai_design():
 @main_routes.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("main_routes.catalog"))
+        return redirect("main_routes.catalog")
 
     if request.method == "POST":
         email = request.form["email"]
@@ -161,7 +161,7 @@ def login():
 
         if user and user.check_password(password):
             login_user(user)
-            return redirect(url_for("main_routes.catalog"))
+            return redirect("main_routes.catalog")
 
         flash("Invalid email or password", "error")
 
@@ -177,7 +177,7 @@ def register():
 
         if User.query.filter_by(email=email).first():
             flash("Email already exists", "error")
-            return redirect(url_for("main_routes.register"))
+            return redirect("main_routes.register")
 
         user = User(email=email)
         user.set_password(password)
@@ -186,7 +186,7 @@ def register():
         db.session.commit()
 
         flash("Account created. Please login.", "success")
-        return redirect(url_for("main_routes.login"))
+        return redirect("main_routes.login")
 
     return render_template("register.html")
 
@@ -196,4 +196,4 @@ def register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("main_routes.login"))
+    return redirect("main_routes.login")
