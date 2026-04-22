@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="info-page">
+
+    <div class="info-card">
+
+        <!-- ABOUT SECTION -->
+        <h1>About InteriorCraft</h1>
+
+        <p>
+            InteriorCraft is a web-based interior design tool that allows users to
+            create, visualize and save their room designs using an interactive editor.
+        </p>
+
+        <p>
+            Users can drag and drop furniture, customize layouts, and manage multiple
+            design projects easily. Our goal is to make interior designing simple,
+            creative and accessible for everyone.
+        </p>
+
+        <h3>Key Features</h3>
+        <ul>
+            <li>Drag & Drop Furniture Editor</li>
+            <li>Save and Load Multiple Room Designs</li>
+            <li>Furniture Catalog for Inspiration</li>
+            <li>User Authentication and Design Management</li>
+        </ul>
+
+        <hr style="margin:30px 0; border-color:#1f2937;">
+
+        <!-- CONTACT SECTION -->
+        <h1>Contact Us</h1>
+
+<p>If you have any queries or suggestions, feel free to reach out.</p>
+
+<form method="POST" action="/contact" class="contact-form">
+
+    <input type="text" name="name" placeholder="Your Name" required>
+
+    <input type="email" name="email" placeholder="Your Email" required>
+
+    <textarea name="message" placeholder="Your Message..." required></textarea>
+
+    <button type="submit">Send Message 🚀</button>
+
+</form>
+
+</div>
+
+</div>
+<style>
+    .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #0f172a;
+    color: white;
+    outline: none;
+}
+
+.contact-form textarea {
+    min-height: 100px;
+    resize: none;
+}
+
+.contact-form button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg,#22d3ee,#0ea5e9);
+    color: #020617;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.contact-form button:hover {
+    transform: scale(1.03);
+}
+
+
+</style>
+
+{% endblock %}

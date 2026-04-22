@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Design Suggestions</title>
+
+<style>
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg,#0f172a,#1e293b,#020617);
+    color: #e2e8f0;
+}
+
+h1 {
+    margin: 40px;
+    font-size: 34px;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+
+.main-container {
+    display: flex;
+    gap: 30px;
+    padding: 20px 40px;
+    align-items: flex-start;
+}
+
+.layout-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 per row */
+    gap: 25px;
+}
+
+@media (max-width: 900px){
+    .layout-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media (max-width: 500px){
+    .layout-grid { column-count: 1; }
+}
+
+.side-panel {
+    width: 260px;
+    position: sticky;
+    top: 90px;
+}
+.panel-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg,#22d3ee,#0ea5e9);
+    color: #020617;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.panel-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(34,211,238,0.4);
+}
+
+.badge {
+    background: linear-gradient(135deg,#22d3ee,#0ea5e9);
+    color: #020617;
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+/* DESIGN CARD */
+
+.layout-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 420px; /* adjust if needed */
+}
+
+.preview-box img {
+    width: 100%;
+    height: 200px;  /* FIXED HEIGHT */
+    object-fit: cover; /* crop nicely */
+}
+
+.layout-card h3 {
+    min-height: 40px;
+}
+
+.layout-card p {
+    min-height: 40px;
+}
+
+.layout-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(34,211,238,0.3);
+}
+
+.layout-card:hover img {
+    transform: scale(1.05);
+    transition: 0.4s;
+}
+/* ROOM PREVIEW */
+
+.preview-box {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.more-btn{
+padding:14px 28px;
+border:none;
+border-radius:30px;
+background:linear-gradient(135deg,#00ffc8,#00b3ff);
+color:black;
+font-weight:600;
+cursor:pointer;
+font-size:16px;
+transition:0.3s;
+}
+
+.more-btn:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 20px rgba(0,255,200,0.4);
+}
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 60px;
+    background: #0b1220;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    border-bottom: 1px solid #1f2937;
+}
+
+.logo {
+    color: #22d3ee;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.nav-links a {
+    color: #cbd5e1;
+    margin-left: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: white;
+}   
+
+.toast {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: linear-gradient(135deg,#22d3ee,#0ea5e9);
+  
+    color: #020617;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    transform: translateX(120%);
+    transition: 0.4s;
+    z-index: 9999;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.hidden {
+    display: none;
+}
+
+.selected-card {
+    border: 2px solid #22d3ee;
+    transform: scale(1.02);
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- 🔝 NAVBAR -->
+<div class="navbar">
+
+    <div class="logo">InteriorCraft</div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/catalog">Catalog</a>
+        <a href="/editor">Editor</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/my_designs">My Designs</a>
+    </div>
+
+</div>
+    
+<h1>✨ Choose Your Design</h1>
+
+<div class="main-container">
+
+    <!-- LEFT: DESIGNS -->
+    <div class="layout-grid" id="layoutGrid"></div>
+
+    <!-- RIGHT: CONTROL PANEL -->
+    <div class="side-panel">
+
+        <h3>⚙️ Actions</h3>
+
+        <button onclick="downloadSelected()" class="panel-btn">⬇ Download</button>
+        <button onclick="saveDesign()" class="panel-btn">💾 Save</button>
+        
+
+        <hr>
+
+        <h4>Selected Design</h4>
+        <img id="previewImage" style="width:100%; border-radius:10px;">
+
+    </div>
+
+</div>
+
+<div style="text-align:center;margin-top:40px;">
+<button id="moreBtn" class="more-btn">Generate More Designs</button>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+
+let selectedImage = null;
+
+function selectDesign(img, element){
+    selectedImage = img;
+    document.getElementById("previewImage").src = img;
+
+    document.querySelectorAll(".layout-card")
+        .forEach(c => c.classList.remove("selected-card"));
+
+    element.classList.add("selected-card");
+}
+
+function downloadImage(url){
+
+    fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "InteriorCraft-Design.jpg";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    })
+    .catch(() => {
+        showToast("Download failed ❌");
+    });
+}
+
+function downloadSelected(){
+    if(!selectedImage){
+        showToast("Please select a design first ⚠️");
+        return;
+    }
+
+    downloadImage(selectedImage);
+}
+
+function saveDesign(){
+    if(!selectedImage) return showToast("Select a design first");
+
+    let saved = JSON.parse(localStorage.getItem("projects")) || [];
+
+    saved.push({
+        id: Date.now(),
+        image: selectedImage,
+        name: "AI Design",
+        createdAt: new Date().toISOString()
+    });
+
+    localStorage.setItem("projects", JSON.stringify(saved));
+
+    showToast("Saved to My Designs ✅");
+}
+
+function likeDesign(btn){
+    btn.innerText = "❤️ Liked";
+}
+
+const prompt = localStorage.getItem("designPrompt") || "";
+const grid = document.getElementById("layoutGrid");
+
+
+
+async function generateAI(){
+
+if(!prompt){
+grid.innerHTML = "<h2>No prompt provided</h2>";
+return;
+}
+
+grid.innerHTML = "<h2>✨ Generating AI Design...</h2>";
+
+try{
+
+const res = await fetch("/generate-ai-design",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body: JSON.stringify({ prompt: prompt, seed: Math.random() })
+});
+
+
+if(!res.ok){
+grid.innerHTML = "<h2>❌ Server failed</h2>";
+return;
+}
+
+let data;
+
+try {
+data = await res.json();
+} catch {
+grid.innerHTML = "<h2>⚠️ Server error</h2>";
+return;
+}
+
+
+if(data.error){
+grid.innerHTML = "<h2>❌ Failed to generate</h2>";
+return;
+}
+
+grid.innerHTML = "";
+
+const descriptions = [
+    "Cozy modern dining setup",
+    "Minimal aesthetic layout",
+    "Luxury interior concept",
+    "Warm lighting ambience"
+];
+
+data.images.forEach((img, index) => {
+
+    grid.innerHTML += `
+<div class="layout-card" onclick="selectDesign('${img}', this)">
+
+    <div class="preview-box">
+        <img src="${img}" style="width:100%;border-radius:16px;">
+    </div>
+
+    <div class="badge">AI Generated</div>
+
+    <h3>Modern Design</h3>
+    <p style="font-size:13px;color:#94a3b8;">
+        ${descriptions[index % descriptions.length]}
+    </p>
+
+    <div style="display:flex; gap:10px; margin-top:10px;">
+        <button onclick="event.stopPropagation(); likeDesign(this)">❤️</button>
+    </div>
+
+</div>
+`;
+});
+
+}catch(err){
+console.error(err);
+grid.innerHTML = "<h2>⚠️ Error</h2>";
+}
+
+
+
+}
+
+grid.innerHTML = "<h2>✨ Generating new design...</h2>";
+/* FIRST LOAD */
+generateAI();
+
+/* BUTTON CLICK */
+document.getElementById("moreBtn").addEventListener("click", () => {
+generateAI();
+});
+
+
+function showToast(message){
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+    toast.classList.remove("hidden");
+
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 10);
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+        toast.classList.add("hidden");
+    }, 2500);
+}
+
+</script>
+
+</body>
+</html>

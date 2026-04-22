@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<div class="curve-divider"></div>
+
+<section class="hero">
+    <div class="hero-slider">
+        <div class="hero-slide active"
+             style="background-image: url('{{ url_for('static', filename='img/hero1.jpg') }}');"></div>
+        <div class="hero-slide"
+             style="background-image: url('{{ url_for('static', filename='img/hero2.jpg') }}');"></div>
+        <div class="hero-slide"
+             style="background-image: url('{{ url_for('static', filename='img/hero3.jpg') }}');"></div>
+    </div>
+
+    <div class="hero-overlay">
+        <div class="hero-content">
+            <h1>Design Spaces That Feel Alive</h1>
+            <p>Create • Visualize • Transform your dream interiors in minutes.</p>
+            <a href="{{ url_for('main_routes.editor') }}" class="hero-btn">
+                Start Designing →
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- WHY SECTION -->
+<section class="why-section">
+    <h2>Why InteriorCraft?</h2>
+
+    <div class="why-grid">
+
+        <div class="why-card">
+            <div>🎨</div>
+            <h3>Creative Freedom</h3>
+            <p>Design your room exactly how you imagine it.</p>
+        </div>
+
+        <div class="why-card">
+            <div>💾</div>
+            <h3>Save Anytime</h3>
+            <p>Your designs are stored securely and accessible anytime.</p>
+        </div>
+
+        <div class="why-card">
+            <div>⚡</div>
+            <h3>Fast & Interactive</h3>
+            <p>Drag, drop and customize furniture instantly.</p>
+        </div>
+
+        <div class="why-card">
+            <div>🛋️</div>
+            <h3>Premium Catalog</h3>
+            <p>Explore beautiful modern furniture collections.</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="steps-section">
+    <h2>How It Works</h2>
+    <div class="steps">
+        <div class="step">
+            <span>1</span>
+            <p>Choose Furniture</p>
+        </div>
+        <div class="step">
+            <span>2</span>
+            <p>Design Your Space</p>
+        </div>
+        <div class="step">
+            <span>3</span>
+            <p>Save & Revisit Anytime</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <h2>Ready To Transform Your Space?</h2>
+    <a href="{{ url_for('main_routes.editor') }}" class="cta-btn">
+        Create Your First Design
+    </a>
+</section>
+
+<script src="{{ url_for('static', filename='js/slider.js') }}"></script>
+<script src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+{% endblock %}

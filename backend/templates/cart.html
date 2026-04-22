@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#020617] text-white px-10 py-8">
+
+  <!-- 🔝 NAVBAR -->
+
+<div class="h-14 bg-[#0b1220] flex items-center justify-between px-6 border-b border-gray-800 shadow-md">
+    <div class="flex items-center gap-6">
+        <h1 class="text-lg font-bold text-blue-400">InteriorCraft</h1>
+        <a href="/" class="text-sm text-gray-300 hover:text-white">Home</a>
+        <a href="/dashboard" class="text-sm text-gray-300 hover:text-white">Dashboard</a>
+        <a href="/catalog" class="text-sm text-gray-300 hover:text-white">Catalog</a>
+    </div>
+</div>
+
+<h1 class="text-3xl font-bold mb-8">Your Cart 🛒</h1>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- 🛒 ITEMS -->
+    <div id="cartContainer" class="lg:col-span-2 space-y-5"></div>
+
+    <!-- 💳 SUMMARY -->
+    <div class="bg-[#0f172a] p-6 rounded-2xl border border-gray-800 h-fit">
+
+        <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+
+        <div class="flex justify-between mb-2">
+            <span>Total</span>
+            <span id="total">₹0</span>
+        </div>
+
+        <button onclick="checkout()"
+            class="w-full mt-4 bg-gradient-to-r from-cyan-400 to-blue-500 py-3 rounded-xl text-black font-semibold hover:scale-105 transition">
+            Checkout
+        </button>
+
+    </div>
+
+</div>
+
+<div id="successModal" class="modal hidden">
+    <div class="modal-box">
+
+        <div class="success-icon">✔</div>
+
+        <h2>Order Placed 🎉</h2>
+        <p>Your furniture is on the way 🛋</p>
+
+        <button onclick="closeModal()">Continue Shopping</button>
+
+    </div>
+</div>
+
+<style>
+
+    .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-box {
+    background: #0f172a;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    width: 300px;
+    animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.success-icon {
+    width: 60px;
+    height: 60px;
+    background: #22d3ee;
+    color: black;
+    font-size: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.modal-box button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    background: #22d3ee;
+    color: black;
+    border: none;
+}
+
+img {
+    transition: 0.3s;
+}
+
+img:hover {
+    transform: scale(1.1);
+}
+
+</style>
+<script>
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+const container = document.getElementById("cartContainer");
+
+let total = 0;
+
+function renderCart(){
+
+    container.innerHTML = "";
+    total = 0;
+
+    cart.forEach((item, index) => {
+
+        total += item.price * (item.qty || 1);
+
+        container.innerHTML += `
+            <div class="flex items-center justify-between bg-[#0f172a] p-4 rounded-2xl border border-gray-800">
+
+                <div class="flex items-center gap-4">
+
+                    <img src="${item.img}" class="w-20 h-20 object-contain bg-white rounded-lg">
+
+                    <div>
+                        <h3 class="font-semibold">${item.name}</h3>
+                        <p class="text-gray-400">₹${item.price}</p>
+
+                        <!-- 🔢 QUANTITY -->
+                        <div class="flex items-center gap-2 mt-2">
+                            <button onclick="changeQty(${index}, -1)" class="px-2 bg-gray-700 rounded">-</button>
+                            <span>${item.qty || 1}</span>
+                            <button onclick="changeQty(${index}, 1)" class="px-2 bg-gray-700 rounded">+</button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ❌ REMOVE -->
+                <button onclick="removeItem(${index})" class="text-red-400 text-xl">✖</button>
+
+            </div>
+        `;
+    });
+
+    document.getElementById("total").innerText = "₹" + total;
+}
+
+function changeQty(i, val){
+    cart[i].qty = (cart[i].qty || 1) + val;
+
+    if(cart[i].qty <= 0){
+        cart.splice(i,1);
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+}
+
+function removeItem(i){
+    cart.splice(i,1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+}
+
+function checkout(){
+
+    if(cart.length === 0){
+        showToast("Cart is empty ❌");
+        return;
+    }
+
+    localStorage.setItem("orders", JSON.stringify(cart));
+    localStorage.removeItem("cart");
+
+    document.getElementById("successModal").classList.remove("hidden");
+}
+
+renderCart();
+
+function closeModal(){
+    document.getElementById("successModal").classList.add("hidden");
+
+    // optional redirect
+    window.location.href = "/catalog";
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>InteriorCraft Editor</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-[#0f172a] text-white">
+
+<!-- NAVBAR -->
+<div class="h-14 bg-[#0b1220] flex justify-between items-center px-6 border-b border-gray-800">
+
+<div class="flex gap-6">
+<h1 class="text-blue-400 font-bold">InteriorCraft</h1>
+<a href="/">Home</a>
+<a href="/dashboard">Dashboard</a>
+<a href="/my_designs">My Designs</a>
+</div>
+
+<div class="flex gap-2">
+<button onclick="downloadImage()" class="bg-blue-500 px-3 py-1 rounded">Download</button>
+<button onclick="saveCanvas()" class="bg-green-500 px-3 py-1 rounded">Save</button>
+<button onclick="deleteObject()" class="bg-red-500 px-3 py-1 rounded">Delete</button>
+<button onclick="resetCanvas()" class="bg-gray-600 px-3 py-1 rounded">Reset</button>
+</div>
+
+</div>
+
+<div class="flex h-[calc(100vh-56px)]">
+
+<!-- 🪑 LEFT SIDEBAR PRO -->
+<div class="w-72 bg-[#0f172a] p-4 border-r border-gray-800 flex flex-col">
+
+    <!-- TITLE -->
+    <h2 class="text-lg font-semibold mb-3">Furniture</h2>
+
+    <!-- 🔍 SEARCH -->
+    <input id="searchFurniture"
+        type="text"
+        placeholder="Search furniture..."
+        class="mb-3 px-3 py-2 rounded bg-[#1f2937] text-sm outline-none focus:ring-2 focus:ring-blue-500">
+
+    <!-- ⭐ FAVORITES TAB -->
+    <button onclick="showFavorites()"
+        class="mb-3 bg-yellow-500 text-black px-3 py-1 rounded text-sm hover:scale-105 transition">
+        ⭐ Favorites
+    </button>
+
+    <!-- CATEGORY TABS -->
+    <div id="category-tabs" class="flex flex-wrap gap-2 mb-4"></div>
+
+    <!-- FURNITURE GRID -->
+    <div id="furniture-list"
+        class="grid grid-cols-2 gap-3 overflow-y-auto pr-1"
+        style="max-height: calc(100vh - 200px);">
+    </div>
+
+</div>
+
+<!-- CANVAS -->
+<div class="flex-1 flex justify-center items-center bg-[#020617]">
+<canvas id="canvas" width="1000" height="550"></canvas>
+</div>
+
+<!-- ⚙️ RIGHT PANEL -->
+    <div class="w-64 bg-[#111827] p-4 border-l border-gray-700 space-y-4">
+
+    <h2 class="text-lg mb-2">Controls</h2>
+
+    <!-- 🧱 WALL COLOR -->
+    <div>
+        <label class="text-sm">Wall Color</label>
+        <input type="color" onchange="changeWallColor(this.value)"
+               class="w-full h-10 mt-1 rounded">
+    </div>
+
+    <!-- 🪵 FLOOR COLOR -->
+    <div>
+        <label class="text-sm">Floor Color</label>
+        <input type="color" onchange="changeFloorColor(this.value)"
+               class="w-full h-10 mt-1 rounded">
+    </div>
+
+    <!-- 📏 RESIZE -->
+    <div>
+        <label class="text-sm">Resize</label>
+        <input type="range"
+       min="0.1"
+       max="2"
+       step="0.05"
+       value="1"
+       id="resizeSlider"
+       class="w-full">
+    </div>
+
+</div>
+
+
+
+</div>
+
+<!-- SAVE MODAL -->
+<div id="saveModal" class="hidden fixed inset-0 flex justify-center items-center bg-black/50">
+
+<div class="bg-white text-black p-6 rounded">
+
+<h2>Saved 🎉</h2>
+
+<select id="designCategory" class="w-full mt-2">
+<option>Living Room</option>
+<option>Bedroom</option>
+<option>Kitchen</option>
+</select>
+
+<button onclick="closeModal()" class="bg-blue-500 text-white px-3 py-1 mt-3">OK</button>
+
+</div>
+
+</div>
+
+<script>
+
+const canvas = new fabric.Canvas('canvas');
+
+// LOAD SAVED DESIGN
+document.addEventListener("DOMContentLoaded", function(){
+
+    const saved = JSON.parse(localStorage.getItem("currentDesign"));
+
+    if(saved && saved.image){
+
+        fabric.Image.fromURL(saved.image, function(img){
+
+            canvas.clear();
+
+            img.set({
+                left: 0,
+                top: 0,
+                selectable: false
+            });
+
+            img.scaleToWidth(canvas.width);
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+
+        });
+
+    }
+
+});
+
+// GRID
+for (let i = 0; i < 1000; i += 50) {
+canvas.add(new fabric.Line([i,0,i,1000],{stroke:'#1f2937', selectable:false}));
+canvas.add(new fabric.Line([0,i,1000,i],{stroke:'#1f2937', selectable:false}));
+}
+
+// RESIZE
+document.getElementById("resizeSlider").oninput = function(){
+let obj = canvas.getActiveObject();
+if(obj){
+obj.scaleX = this.value;
+obj.scaleY = this.value;
+canvas.renderAll();
+}
+}
+
+// SAVE
+function saveCanvas(){
+    document.getElementById("saveModal").classList.remove("hidden");
+}
+
+function closeModal(){
+
+    let data = canvas.toDataURL({
+        format: "png",
+        quality: 1
+    });
+
+    let category = document.getElementById("designCategory").value;
+
+    let projects = JSON.parse(localStorage.getItem("projects")) || [];
+
+    const newProject = {
+        id: Date.now(),
+        image: data,
+        name: "My Design",
+        category: category,
+        createdAt: new Date().toISOString(),
+        favorite: false
+    };
+
+    projects.push(newProject);
+
+    localStorage.setItem("projects", JSON.stringify(projects));
+
+    document.getElementById("saveModal").classList.add("hidden");
+
+    showToast("Design Saved ✅");
+}
+
+// DELETE
+function deleteObject(){
+let obj = canvas.getActiveObject();
+if(obj) canvas.remove(obj);
+}
+
+// RESET
+function resetCanvas(){
+canvas.clear();
+}
+
+// COLORS
+function changeWallColor(c){
+canvas.setBackgroundColor(c, canvas.renderAll.bind(canvas));
+}
+
+function changeFloorColor(c){
+let rect = new fabric.Rect({
+left:0,
+top:450,
+width:1000,
+height:100,
+fill:c,
+selectable:false
+});
+canvas.add(rect);
+}
+
+// ADD FURNITURE
+function addFurniture(src){
+fabric.Image.fromURL(src, function(img){
+img.scaleToWidth(150);
+canvas.add(img);
+});
+}
+
+// DATA
+const furniture = {
+
+Chairs: [
+"/static/img/chair.png",
+"/static/img/chair1.png",
+"/static/img/chair2.png",
+"/static/img/chair3.png",
+"/static/img/chair4.png",
+"/static/img/chair5.png",
+"/static/img/chair6.png",
+"/static/img/armchair.png"
+],
+
+Sofas: [
+"/static/img/sofa.png",
+"/static/img/sofa2.png",
+"/static/img/sofa3.png",
+"/static/img/sofa4.png",
+"/static/img/sofa5.png",
+"/static/img/sofa6.png"
+],
+
+Beds: [
+"/static/img/bed.png",
+"/static/img/bed1.png",
+"/static/img/bed2.png",
+"/static/img/bed3.png",
+"/static/img/bed4.png",
+"/static/img/bed5.png",
+"/static/img/bed6.png"
+],
+
+Tables: [
+"/static/img/coffee_table.png",
+"/static/img/dining_table.png",
+"/static/img/t1.png",
+"/static/img/t2.png",
+"/static/img/dt1.png",
+"/static/img/dt2.png"
+],
+
+TV_Unit: [
+"/static/img/tv_unit.png",
+"/static/img/tv1.png",
+"/static/img/tv2.png",
+"/static/img/tv3.png"
+],
+
+Wardrobe: [
+"/static/img/wr1.png",
+"/static/img/wr2.png",
+"/static/img/wr3.png",
+"/static/img/wr4.png",
+"/static/img/wr5.png"
+],
+
+Decor: [
+"/static/img/plant.png",
+"/static/img/plant2.png",
+"/static/img/fv1.png",
+"/static/img/fv2.png",
+"/static/img/lamp.png"
+],
+
+Rugs: [
+"/static/img/rug1.png",
+"/static/img/rug2.png",
+"/static/img/carpet.png"
+],
+
+Office: [
+"/static/img/desk1.png",
+"/static/img/chair3.png"
+],
+
+Extra: [
+"/static/img/m1.png",
+"/static/img/m2.png",
+"/static/img/placeholder.png"
+]
+
+};
+
+function showCategory(category) {
+
+    const list = document.getElementById("furniture-list");
+    list.innerHTML = "";
+
+    furniture[category].forEach(src => {
+
+        const card = document.createElement("div");
+
+        card.className = `
+            bg-[#1f2937]
+            rounded-xl 
+            h-28 
+            flex items-center justify-center 
+            cursor-pointer 
+            hover:scale-105 
+            hover:shadow-lg hover:shadow-blue-500/20
+            transition 
+            relative
+        `;
+
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "max-h-full max-w-full object-contain";
+
+        // ⭐ FAVORITE ICON
+        const fav = document.createElement("div");
+        fav.innerHTML = "🤍";
+        fav.className = "absolute top-1 right-2 cursor-pointer text-sm";
+
+        fav.onclick = (e) => {
+            e.stopPropagation();
+            toggleFurnitureFavorite(src, fav);
+        };
+
+        card.appendChild(img);
+        card.appendChild(fav);
+
+        card.onclick = () => addFurniture(src);
+
+        list.appendChild(card);
+    });
+}
+
+
+function toggleFurnitureFavorite(src, el) {
+
+    let favs = JSON.parse(localStorage.getItem("favFurniture")) || [];
+
+    if (favs.includes(src)) {
+        favs = favs.filter(i => i !== src);
+        el.innerHTML = "🤍";
+    } else {
+        favs.push(src);
+        el.innerHTML = "❤️";
+    }
+
+    localStorage.setItem("favFurniture", JSON.stringify(favs));
+}
+
+function showFavorites() {
+
+    const list = document.getElementById("furniture-list");
+    list.innerHTML = "";
+
+    let favs = JSON.parse(localStorage.getItem("favFurniture")) || [];
+
+    favs.forEach(src => {
+
+        const card = document.createElement("div");
+
+        card.className = `
+            bg-[#1f2937]
+            rounded-xl 
+            h-28 
+            flex items-center justify-center 
+            cursor-pointer 
+            hover:scale-105 
+            transition
+        `;
+
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "max-h-full max-w-full object-contain";
+
+        card.appendChild(img);
+        card.onclick = () => addFurniture(src);
+
+        list.appendChild(card);
+    });
+}
+
+// LOAD UI
+function loadFurniture() {
+
+    const tabs = document.getElementById("category-tabs");
+    tabs.innerHTML = "";
+
+    Object.keys(furniture).forEach((category, index) => {
+
+        const btn = document.createElement("button");
+        btn.innerText = category;
+
+        btn.className = "px-3 py-1 bg-gray-700 rounded text-xs hover:bg-blue-500 transition";
+
+        btn.onclick = () => {
+
+            showCategory(category);
+
+            document.querySelectorAll("#category-tabs button").forEach(b => {
+                b.classList.remove("bg-blue-500");
+                b.classList.add("bg-gray-700");
+            });
+
+            btn.classList.remove("bg-gray-700");
+            btn.classList.add("bg-blue-500");
+        };
+
+        tabs.appendChild(btn);
+
+        if (index === 0) {
+            showCategory(category);
+            btn.classList.add("bg-blue-500");
+        }
+    });
+}
+
+loadFurniture();
+
+</script>
+
+</body>
+</html>

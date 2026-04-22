@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/catalog.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="catalog-hero">
+    <div class="hero-overlay"></div>
+
+    <div class="catalog-hero-inner">
+        <div class="catalog-hero-text">
+            <h1>Find The Perfect Furniture</h1>
+            <p>Design your dream space with curated modern interiors</p>
+
+            <button onclick="document.getElementById('designPrompt').focus()">
+                Start Designing →
+            </butxds    q1qton>
+        </div>
+    </div>
+</section>
+
+<div class="filter-wrapper">
+
+    <div class="main-filters">
+        <button class="filter-btn active" data-category="all">All</button>
+        <button class="filter-btn" data-category="living">Living Room</button>
+        <button class="filter-btn" data-category="bedroom">Bedroom</button>
+        <button class="filter-btn" data-category="decor">Decor</button>
+    </div>
+
+    <div class="sub-filters" id="subFilters"></div>
+
+</div>
+
+<p class="selection-info">
+    👉 Click furniture items to select them. Selected items will glow.
+</p>
+
+<div class="prompt-generator">
+    <input type="text"
+        id="designPrompt"
+        placeholder="Describe your dream room (e.g. cozy bedroom with warm lights and wardrobe)">
+</div>
+
+<div class="design-generator">
+    <button id="generateDesignsBtn">
+        ✨ Generate Design Ideas
+    </button>
+</div>
+
+<div class="catalog-grid">
+
+
+    
+{% for img, cat in [
+('sofa.png','living'),('sofa2.png','living'),('sofa3.png','living'),
+('sofa4.png','living'),('sofa5.png','living'),('sofa6.png','living'),
+
+('chair.png','living'),('chair1.png','living'),('chair2.png','living'),
+('chair3.png','living'),('chair4.png','living'),('chair5.png','living'),('chair6.png','living'),
+
+('coffee_table.png','living'),('t1.png','living'),('t2.png','living'),
+('tv_unit.png','living'),('tv1.png','living'),('tv2.png','living'),('tv3.png','living'),
+
+('rug1.png','decor'),('rug2.png','decor'),('carpet.png','decor'),
+('plant.png','decor'),('plant2.png','decor'),('lamp.png','decor'),
+('fv1.png','decor'),('fv2.png','decor'),
+
+('bed.png','bedroom'),('bed1.png','bedroom'),('bed2.png','bedroom'),
+('bed3.png','bedroom'),('bed4.png','bedroom'),('bed5.png','bedroom'),('bed6.png','bedroom'),
+
+('m1.png','bedroom'),('m2.png','bedroom'),
+
+('dining_table.png','living'),('dt1.png','living'),('dt2.png','living'),
+('desk1.png','living'),
+
+('wr1.png','bedroom'),('wr2.png','bedroom'),('wr3.png','bedroom'),
+('wr4.png','bedroom'),('wr5.png','bedroom'),
+] %}
+
+
+
+{% set sub =
+    'sofa' if img.startswith('sofa') else
+    'chair' if img.startswith('chair') else
+    'tv' if img.startswith('tv') else
+    'dining' if img.startswith('dining') or img.startswith('dt') else
+    'coffee' if img.startswith('coffee') or img in ['t1.png','t2.png'] else
+    'desk' if img.startswith('desk') else
+    'bed' if img.startswith('bed') else
+    'wardrobe' if img.startswith('wr') else
+    'mirror' if img.startswith('m') else
+    'rug' if img.startswith('rug') or img.startswith('carpet') else
+    'plant' if img.startswith('plant') or img.startswith('fv') else
+    'lamp' if img.startswith('lamp') else
+    'other'
+%}
+
+{% set name =
+    'Luxury Sofa' if img.startswith('sofa') else
+    'Comfort Chair' if img.startswith('chair') else
+    'King Size Bed' if img.startswith('bed') else
+    'Coffee Table' if img.startswith('coffee') or img in ['t1.png','t2.png'] else
+    'Dining Table' if img.startswith('dining') or img.startswith('dt') else
+    'TV Unit' if img.startswith('tv') else
+    'Wardrobe' if img.startswith('wr') else
+    'Mirror Decor' if img.startswith('m') else
+    'Rug Carpet' if img.startswith('rug') or img.startswith('carpet') else
+    'Indoor Plant' if img.startswith('plant') or img.startswith('fv') else
+    'Modern Lamp' if img.startswith('lamp') else
+    'Furniture Item'
+%}
+
+{% set tag =
+    'New' if loop.index % 3 == 0 else
+    'Popular' if loop.index % 2 == 0 else
+    ''
+%}
+
+{% set rating =
+    5 if loop.index % 5 == 0 else
+    4 if loop.index % 4 == 0 else
+    3 if loop.index % 3 == 0 else
+    4
+%}
+
+<div class="furniture-card {{cat}} selectable"
+     data-category="{{cat}}" 
+     data-subcategory="{{sub}}">
+     
+    <div class="checkmark">✔</div>
+
+
+
+{% set price =
+    5000 if img.startswith('sofa') else
+    2000 if img.startswith('chair') else
+    3000 if img.startswith('bed') else
+    2500 if img.startswith('coffee') else
+    4000 if img.startswith('dining') else
+    3500 if img.startswith('tv') else
+    1500 if img.startswith('rug') else
+    800 if img.startswith('plant') else
+    1200 if img.startswith('lamp') else
+    4500 if img.startswith('wr') else
+    1800 if img.startswith('m') else
+    2200
+%}
+
+    <div class="card-image">
+        <img src="{{ url_for('static', filename='img/' + img) }}">
+    </div>
+
+   <div class="card-info">
+
+    {% if tag %}
+    <span class="tag">{{tag}}</span>
+    {% endif %}
+
+    <h3>{{name}}</h3>
+
+<div class="rating">
+    {% for i in range(rating) %}⭐{% endfor %}
+    {% for i in range(5 - rating) %}☆{% endfor %}
+    <span class="text-gray-400 text-xs ml-1">({{rating}}.0)</span>
+</div>
+
+    <p class="price">₹{{price}}</p>
+
+    <span class="card-category">{{cat|capitalize}}</span>
+
+    <button class="cart-btn"
+        data-name="{{name}}"
+        data-price="{{price}}"
+        data-img="{{ url_for('static', filename='img/' + img) }}">
+        Add to Cart 🛒
+    </button>
+
+</div>
+
+<div id="toast" class="toast hidden">
+    Added to Cart 🛒
+</div>
+</div>
+
+{% endfor %}
+
+</div>
+
+<script>
+
+let selectedItems = [];
+
+/* SELECT FURNITURE */
+document.querySelectorAll('.selectable').forEach(card => {
+
+card.addEventListener('click', function(){
+
+// ✅ FIX: store relative path (IMPORTANT)
+const img = this.querySelector('img').getAttribute("src");
+
+if(selectedItems.includes(img)){
+selectedItems = selectedItems.filter(i => i !== img);
+this.classList.remove('selected');
+}
+else{
+selectedItems.push(img);
+this.classList.add('selected');
+}
+
+});
+
+});
+
+
+/* GENERATE BUTTON */
+document.getElementById("generateDesignsBtn").addEventListener("click", function(){
+
+const prompt = document.getElementById("designPrompt").value.trim();
+
+/* SAVE DATA */
+localStorage.setItem("selectedFurniture", JSON.stringify(selectedItems));
+localStorage.setItem("designPrompt", prompt);
+
+/* VALIDATION */
+if(prompt === "" && selectedItems.length === 0){
+alert("Please enter a prompt OR select furniture.");
+return;
+}
+
+/* 🚀 FINAL LOGIC */
+if(selectedItems.length > 0 && prompt === ""){
+    // only furniture → go editor
+    window.location.href = "/editor";
+}
+else{
+    // prompt OR both → suggestions
+    window.location.href = "/design-suggestions";
+}
+
+});
+
+function showToast(message){
+
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+
+    toast.classList.remove("hidden");
+
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 10);
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+        toast.classList.add("hidden");
+    }, 2500);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+const filterBtns = document.querySelectorAll(".filter-btn");
+const cards = document.querySelectorAll(".furniture-card");
+const subFiltersDiv = document.getElementById("subFilters");
+
+filterBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+
+        const category = btn.dataset.category;
+
+        // ACTIVE UI
+        filterBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        // MAIN FILTER
+        cards.forEach(card => {
+            if (category === "all" || card.dataset.category === category) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+
+        // CLEAR SUB FILTERS
+        subFiltersDiv.innerHTML = "";
+
+        let subs = [];
+
+        if(category === "living"){
+            subs = ["sofa","chair","tv","coffee","dining","desk"];
+        }
+        else if(category === "bedroom"){
+            subs = ["bed","wardrobe","mirror"];
+        }
+        else if(category === "decor"){
+            subs = ["plant","lamp","rug"];
+        }
+
+        // CREATE SUB FILTER BUTTONS
+        subs.forEach(sub => {
+
+            const subBtn = document.createElement("button");
+            subBtn.innerText = sub;
+            subBtn.className = "filter-btn";
+
+            subBtn.addEventListener("click", () => {
+
+                document.querySelectorAll("#subFilters .filter-btn")
+                    .forEach(b => b.classList.remove("active"));
+
+                subBtn.classList.add("active");
+
+                cards.forEach(card => {
+                    if (
+                        card.dataset.category === category &&
+                        card.dataset.subcategory === sub
+                    ) {
+                        card.style.display = "block";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+
+            });
+
+            subFiltersDiv.appendChild(subBtn);
+        });
+
+    });
+});
+
+});
+
+
+
+document.querySelectorAll(".cart-btn").forEach(btn => {
+
+    btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        const item = {
+            name: btn.dataset.name,
+            price: parseInt(btn.dataset.price),
+            img: btn.dataset.img
+        };
+
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        cart.push(item);
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        showToast("Added to Cart 🛒");
+      
+    });
+
+});
+
+</script>
+
+{% endblock %}

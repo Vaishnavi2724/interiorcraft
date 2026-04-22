@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register | InteriorCraft</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
+
+</head>
+<body>
+
+<div class="auth-wrapper">
+
+    <div class="auth-left">
+        <img src="{{ url_for('static', filename='img/auth_bg.jpg') }}" alt="Illustration">
+    </div>
+
+    <div class="auth-right">
+        <h2>Create Account</h2>
+
+        <form method="POST">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="Enter your email" required>
+
+            <label>Password</label>
+            <div class="password-wrapper">
+            <input type="password" name="password" placeholder="Create password" required>
+            <span class="toggle-password">🙈</span>
+            </div>
+
+            <button type="submit">Sign Up</button>
+        </form>
+
+        <div class="auth-links">
+            Already have an account? <a href="/login">Login</a>
+        </div>
+    </div>
+    <div id="themeToggle" class="theme-toggle">🌙</div>
+
+</div>
+
+</body>
+</html>
